@@ -1,4 +1,3 @@
-import { distance } from '../relations/distance'
 import type Point from './point'
 
 export default class Segment {
@@ -12,8 +11,8 @@ export default class Segment {
     if (p0.isSame(p1)) throw new Error('Duplicate point')
   }
 
-  length (p0: Point, p1: Point) {
-    return distance(p0, p1)
+  length () {
+    return this.p0.distance(this.p1)
   }
 
 }

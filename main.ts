@@ -1,19 +1,11 @@
-import Point from './class/point'
 import Triangle from './class/triangle'
-import { isRectangle } from './theorems/pythagore'
 
-const triangleA = new Triangle(
-  new Point(0,0),
-  new Point(0,1),
-  new Point(2,2)
-)
-const isTriangleARectangle = isRectangle(triangleA)
-console.log({ isTriangleARectangle })
+console.log(Triangle.getTriangleFromDistances([2,4,5]).isRectangle())
+console.log(Triangle.getTriangleFromDistances([3,4,5]).isRectangle())
 
-const triangleB = new Triangle(
-  new Point(0,0),
-  new Point(3,0),
-  new Point(0,4)
-)
-const triangleBRectangle = isRectangle(triangleB)
-console.log({ triangleBRectangle })
+console.log(Triangle.getTriangleFromDistances([2,4,5]).isIsocele())
+console.log(Triangle.getTriangleFromDistances([2,4,4]).isIsocele())
+
+console.log(Triangle.getTriangleFromDistances([4,4,5]).isEquilateral())
+console.log(Triangle.getTriangleFromDistances([4,4,4]).isEquilateral())
+
