@@ -7,30 +7,46 @@ export default class Triangle {
   p2: Point
 
   static getTriangleFromDistances (distances: number[]) {
-    if (distances.length !== 3) throw new Error('A triangle must have 3 points')
+    if (distances.length !== 3) throw new Error('A triangle requires exactly 3 distances')
+    if (distances.some(d => d <= 0)) throw new Error('All distances must be positive')
     const [a, b, c] = distances
-    // Place p0 at (0,0), p1 at (c,0)
+    // Check triangle inequality: sum of any two sides must be greater than the third side
+    if (a + b <= c || a + c <= b || b + c <= a) {
+      throw new Error('Triangle inequality violation: these distances cannot form a valid triangle')
+    }
+    // Create points to form a triangle with the given distances
+    // We'll place the triangle in a coordinate system for convenience
+    // p0 at origin (0, 0)
     const p0 = new Point(0, 0)
-    const p1 = new Point(c, 0)
-    // Find p2 using law of cosines
-    // a = distance p1-p2, b = distance p0-p2, c = distance p0-p1
-    // p2 = (x, y)
-    // |p2 - p0| = b => sqrt(x^2 + y^2) = b
-    // |p2 - p1| = a => sqrt((x-c)^2 + y^2) = a
-    // Solve for x:
-    // (x-c)^2 + y^2 = a^2
-    // x^2 + y^2 = b^2
-    // Expand first: x^2 - 2cx + c^2 + y^2 = a^2
-    // Substitute y^2 = b^2 - x^2:
-    // x^2 - 2cx + c^2 + (b^2 - x^2) = a^2
-    // -2cx + c^2 + b^2 = a^2
-    // -2cx = a^2 - b^2 - c^2
-    // x = (c^2 + b^2 - a^2) / (2c)
-    const x = (c ** 2 + b ** 2 - a ** 2) / (2 * c)
-    const ySquared = b ** 2 - x ** 2
-    if (ySquared < 0) throw new Error('Impossible triangle side lengths')
-    const y = Math.sqrt(ySquared)
+
+    // p1 along x-axis at distance a from p0
+    const p1 = new Point(a, 0)
+
+    // Calculate p2 using law of cosines
+    // We need to find coordinates (x, y) for p2 such that:
+    // distance(p0, p2) = b
+    // distance(p1, p2) = c
+
+    // Using the law of cosines:
+    // c² = a² + b² - 2ab*cos(γ)
+    // where γ is the angle at p0
+    const cosGamma = (a * a + b * b - c * c) / (2 * a * b)
+
+    // Validate cosine value is within [-1, 1] (should be due to triangle inequality)
+    if (Math.abs(cosGamma) > 1) {
+      // This shouldn't happen if triangle inequality is satisfied,
+      // but handle floating point precision issues
+      throw new Error('Invalid triangle configuration')
+    }
+
+    const sinGamma = Math.sqrt(1 - cosGamma * cosGamma)
+
+    // Calculate coordinates of p2
+    const x = b * cosGamma
+    const y = b * sinGamma
     const p2 = new Point(x, y)
+
+    // Create and return the triangle
     return new Triangle([p0, p1, p2])
   }
 
@@ -53,7 +69,7 @@ export default class Triangle {
     return false
   }
 
-  private allDistances () {
+  allDistances () {
     const distanceAB = this.p0.distance(this.p1)
     const distanceBC = this.p1.distance(this.p2)
     const distanceAC = this.p2.distance(this.p0)
